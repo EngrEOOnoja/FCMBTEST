@@ -1,7 +1,7 @@
 package com.user.services;
 
 import com.user.data.models.UserInfo;
-import com.user.data.repository.CustomerRepository;
+import com.data.repository.CustomerRepository;
 import com.user.dtos.request.UserRequest;
 import com.user.dtos.response.UserResponse;
 import com.user.exception.EmailExistException;
