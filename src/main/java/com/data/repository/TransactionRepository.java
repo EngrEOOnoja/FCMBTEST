@@ -1,45 +1,40 @@
-package com.data.repository;
+package com.user.data.repository;
 
-import com.data.models.Transaction;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import com.user.data.models.Transaction;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends MongoRepository<Transaction, String> {
 
     List<Transaction> findBySourceAccountOrderByTransactionDateDesc(String sourceAccount);
 
-    @Query("SELECT t FROM Transaction t WHERE t.sourceAccount = :accountNumber " +
-            "AND t.transactionDate >= :startDate AND t.transactionDate <= :endDate " +
-            "AND t.status = 'SUCCESSFUL' " +
-            "ORDER BY t.transactionDate DESC")
+
+    @Query("{ 'sourceAccount': ?0, 'transactionDate': { '$gte': ?1, '$lte': ?2 }, 'status': 'SUCCESSFUL' }")
     List<Transaction> findSuccessfulTransactionsByAccountAndDateRange(
-            @Param("accountNumber") String accountNumber,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
+            String accountNumber,
+            LocalDateTime startDate,
+            LocalDateTime endDate
     );
 
-    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.sourceAccount = :accountNumber " +
-            "AND t.transactionDate >= :startDate AND t.transactionDate <= :endDate " +
-            "AND t.status = 'SUCCESSFUL'")
+
+    @Query(value = "{ 'sourceAccount': ?0, 'transactionDate': { '$gte': ?1, '$lte': ?2 }, 'status': 'SUCCESSFUL' }", count = true)
     long countSuccessfulTransactionsByAccountInMonth(
-            @Param("accountNumber") String accountNumber,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
+            String accountNumber,
+            LocalDateTime startDate,
+            LocalDateTime endDate
     );
 
-    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.sourceAccount = :accountNumber " +
-            "AND t.transactionDate >= :startDate AND t.transactionDate <= :endDate " +
-            "AND t.status = 'SUCCESSFUL' AND t.transactionType <> 'AIRTIME_PURCHASE'")
+
+    @Query(value = "{ 'sourceAccount': ?0, 'transactionDate': { '$gte': ?1, '$lte': ?2 }, 'status': 'SUCCESSFUL', 'transactionType': { '$ne': 'AIRTIME_PURCHASE' } }", count = true)
     long countNonAirtimeTransactionsByAccountInMonth(
-            @Param("accountNumber") String accountNumber,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
+            String accountNumber,
+            LocalDateTime startDate,
+            LocalDateTime endDate
     );
 
     boolean existsByTransactionReference(String transactionReference);

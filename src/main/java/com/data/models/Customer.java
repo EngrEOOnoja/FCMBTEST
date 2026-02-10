@@ -1,19 +1,33 @@
-package com.data.models;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+package com.user.data.models;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
-@Entity
+@Data
+@NoArgsConstructor
 public class Customer {
+
     @Id
-    private  Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private LocalDateTime RegistrationDate;
+    private Long id;
+
+    private String name;
+
+    private String customerId;
+
+    private CustomerType customerType;
+
+    private LocalDateTime registrationDate;
+
+    private List<Account> accounts = new ArrayList<>();
+
+    private Boolean active = true;
+
+    public enum CustomerType {
+        BUSINESS,
+        RETAIL
+    }
 }
